@@ -40,7 +40,7 @@ async function fun(index) {
     let data = JSON.parse(resp);
     let counter = 0;
     for (let article of data['news'][index]['articles']) {
-        if (article['urlToImage'].includes('./img')) {
+        if (article['urlToImage'] != null && article['urlToImage'].includes('./img')) {
             counter++;
             try {
                 let result = await Mercury.parse(article['url']).catch(err => { console.log("mercuryError", err) });
