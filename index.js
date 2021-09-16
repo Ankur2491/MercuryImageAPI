@@ -61,7 +61,7 @@ app.post('/smartRead', jsonParser, async (req, res) => {
     result.content = result.content.replace(/&#x201E;/g,",,");
     result.content = result.content.replace(/&#x2039;/g,"<");
     result.content = result.content.replace(/&#x203A;/g,">");
-
+    result.content = result.content.replace(/&#x20B9;/g,"₹");
     const params = new URLSearchParams()
     params.append('payload', result.content);
     const config = {
