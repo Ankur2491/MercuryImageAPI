@@ -32,6 +32,17 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
+app.get('/search/:query', async (req, res)=>{
+    let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20`)
+    res.send(resp.data);
+})
+
+app.get('/searchByPageIndex/:query/:index', async (req, res)=>{
+    let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20&page=${req.params.index}`)
+    res.send(resp.data);
+})
+
+
 app.post('/smartRead', jsonParser, async (req, res) => {
     console.log(req.body);
     const url = req.body.url
