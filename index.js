@@ -32,14 +32,28 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
-app.get('/search/:query', async (req, res)=>{
-    let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20`)
-    res.send(resp.data);
+app.get('/search/:query/:pref', async (req, res) => {
+    let preference = req.params.pref;
+    if (preference == "pop") {
+        let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20`)
+        res.send(resp.data);
+    }
+    else {
+        let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20`)
+        res.send(resp.data);
+    }
 })
 
-app.get('/searchByPageIndex/:query/:index', async (req, res)=>{
-    let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20&page=${req.params.index}`)
-    res.send(resp.data);
+app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
+    let preference = req.params.pref;
+    if (preference == "pop") {
+        let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20&page=${req.params.index}`)
+        res.send(resp.data);
+    }
+    else {
+        let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20&page=${req.params.index}`)
+        res.send(resp.data);
+    }
 })
 
 
@@ -57,22 +71,22 @@ app.post('/smartRead', jsonParser, async (req, res) => {
     result.content = result.content.replace(/&#x2019;/g, "'")
     result.content = result.content.replace(/&#x2013;/g, "-")
     result.content = result.content.replace(/&#x2026;/g, "...")
-    result.content = result.content.replace(/&#x2C6;/g,"^");
-    result.content = result.content.replace(/&#x2DC;/g,"~");
-    result.content = result.content.replace(/&#x2002;/g," ");
-    result.content = result.content.replace(/&#x2003;/g," ");
-    result.content = result.content.replace(/&#x2009;/g," ");
-    result.content = result.content.replace(/&#x200C;/g," ");
-    result.content = result.content.replace(/&#x200D;/g," ");
-    result.content = result.content.replace(/&#x200E;/g," ");
-    result.content = result.content.replace(/&#x200F;/g," ");
-    result.content = result.content.replace(/&#x2014;/g,"--");
-    result.content = result.content.replace(/&#x2018;/g,"'");
-    result.content = result.content.replace(/&#x201A;/g,"‚");
-    result.content = result.content.replace(/&#x201E;/g,",,");
-    result.content = result.content.replace(/&#x2039;/g,"<");
-    result.content = result.content.replace(/&#x203A;/g,">");
-    result.content = result.content.replace(/&#x20B9;/g,"₹");
+    result.content = result.content.replace(/&#x2C6;/g, "^");
+    result.content = result.content.replace(/&#x2DC;/g, "~");
+    result.content = result.content.replace(/&#x2002;/g, " ");
+    result.content = result.content.replace(/&#x2003;/g, " ");
+    result.content = result.content.replace(/&#x2009;/g, " ");
+    result.content = result.content.replace(/&#x200C;/g, " ");
+    result.content = result.content.replace(/&#x200D;/g, " ");
+    result.content = result.content.replace(/&#x200E;/g, " ");
+    result.content = result.content.replace(/&#x200F;/g, " ");
+    result.content = result.content.replace(/&#x2014;/g, "--");
+    result.content = result.content.replace(/&#x2018;/g, "'");
+    result.content = result.content.replace(/&#x201A;/g, "‚");
+    result.content = result.content.replace(/&#x201E;/g, ",,");
+    result.content = result.content.replace(/&#x2039;/g, "<");
+    result.content = result.content.replace(/&#x203A;/g, ">");
+    result.content = result.content.replace(/&#x20B9;/g, "₹");
     const params = new URLSearchParams()
     params.append('payload', result.content);
     const config = {
