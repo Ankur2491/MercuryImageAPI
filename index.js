@@ -16,12 +16,12 @@ var allowlist = ['https://hacker-board.herokuapp.com']
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
     if (allowlist.indexOf(req.header('Origin')) !== -1) {
-      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+        corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
     } else {
-      corsOptions = { origin: false } // disable CORS for this request
+        corsOptions = { origin: false } // disable CORS for this request
     }
     callback(null, corsOptions) // callback expects two parameters: error and options
-  }
+}
 const Mercury = require('@postlight/mercury-parser');
 
 var imagekit = new ImageKit({
@@ -31,7 +31,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", jsonParser, (req, res) => {
+app.post("/image", Cors(corsOptionsDelegate), jsonParser, (req, res) => {
     const url = req.body.url
     Mercury.parse(url).then(result => res.send(result));
 
