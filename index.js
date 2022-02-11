@@ -31,7 +31,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", Cors(corsOptionsDelegate), jsonParser, (req, res) => {
+app.post("/image", jsonParser, Cors(corsOptionsDelegate), (req, res) => {
     const url = req.body.url
     Mercury.parse(url).then(result => res.send(result));
 
