@@ -11,7 +11,17 @@ const asyncRedisClient = asyncRedis.createClient({ host: redis_host, port: redis
 var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
-app.use(Cors())
+// app.use(Cors())
+var allowlist = ['https://hacker-board.herokuapp.com']
+var corsOptionsDelegate = function (req, callback) {
+    var corsOptions;
+    if (allowlist.indexOf(req.header('Origin')) !== -1) {
+      corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+    } else {
+      corsOptions = { origin: false } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
+  }
 const Mercury = require('@postlight/mercury-parser');
 
 var imagekit = new ImageKit({
@@ -32,7 +42,7 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
-app.get('/search/:query/:pref', async (req, res) => {
+app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
     let preference = req.params.pref;
     if (preference == "pop") {
         let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20`)
