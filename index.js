@@ -10,17 +10,26 @@ let redis_password = "AFahzbIs3wTxs0VMPnvTqkuqyoZOWXwV"
 const asyncRedisClient = asyncRedis.createClient({ host: redis_host, port: redis_port, password: redis_password })
 var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
-var jsonParser = bodyParser.json()
+// var jsonParser = bodyParser.json()
 // app.use(Cors())
+app.use(Cors({ allowedHeaders: 'Content-Type, Cache-Control' }));
+app.options('*', Cors());  // enable pre-flight
+app.use(bodyParser.json({ verify: rawBodyHandler }));
 var allowlist = ['https://hacker-board.herokuapp.com']
-var corsOptionsDelegate = function (req, callback) {
-    var corsOptions;
-    if (allowlist.indexOf(req.header('Origin')) !== -1) {
-        corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-    } else {
-        corsOptions = { origin: false } // disable CORS for this request
+// var corsOptionsDelegate = function (req, callback) {
+//     var corsOptions;
+//     if (allowlist.indexOf(req.header('Origin')) !== -1) {
+//         corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+//     } else {
+//         corsOptions = { origin: false } // disable CORS for this request
+//     }
+//     callback(null, corsOptions) // callback expects two parameters: error and options
+// }
+var rawBodyHandler = function (req, res, buf, encoding) {
+    if (buf && buf.length) {
+        req.rawBody = buf.toString(encoding || 'utf8');
+        console.log('Raw body: ' + req.rawBody);
     }
-    callback(null, corsOptions) // callback expects two parameters: error and options
 }
 const Mercury = require('@postlight/mercury-parser');
 
@@ -31,7 +40,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", jsonParser, Cors(corsOptionsDelegate), (req, res) => {
+app.post("/image", (req, res) => {
     const url = req.body.url
     Mercury.parse(url).then(result => res.send(result));
 
@@ -42,7 +51,7 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
-app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/search/:query/:pref', async (req, res) => {
     let preference = req.params.pref;
     if (preference == "pop") {
         let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20`)
@@ -67,7 +76,7 @@ app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
 })
 
 
-app.post('/smartRead', jsonParser, async (req, res) => {
+app.post('/smartRead', async (req, res) => {
     console.log(req.body);
     const url = req.body.url
     let result = await Mercury.parse(url).catch(err => { console.log("mercuryError", err) });
