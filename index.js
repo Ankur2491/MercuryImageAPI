@@ -12,16 +12,10 @@ var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
 app.use(jsonParser)
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", '*');
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header("Access-Control-Allow-Headers", 'content-type');
-    next();
-});
 var allowlist = ['https://hacker-board.herokuapp.com']
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
+    console.log("HEADER::",req.header('Origin'))
     if (allowlist.indexOf(req.header('Origin')) !== -1) {
         corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
     } else {
