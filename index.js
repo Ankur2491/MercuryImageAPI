@@ -11,7 +11,7 @@ const asyncRedisClient = asyncRedis.createClient({ host: redis_host, port: redis
 var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
-// app.use(Cors())
+app.use(jsonParser)
 var allowlist = ['https://hacker-board.herokuapp.com']
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
@@ -31,7 +31,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", jsonParser, Cors(corsOptionsDelegate), (req, res) => {
+app.post("/image", Cors(corsOptionsDelegate), (req, res) => {
     const url = req.body.url
     Mercury.parse(url).then(result => res.send(result));
 
@@ -67,7 +67,7 @@ app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
 })
 
 
-app.post('/smartRead', jsonParser, async (req, res) => {
+app.post('/smartRead', Cors(corsOptionsDelegate), async (req, res) => {
     console.log(req.body);
     const url = req.body.url
     let result = await Mercury.parse(url).catch(err => { console.log("mercuryError", err) });
