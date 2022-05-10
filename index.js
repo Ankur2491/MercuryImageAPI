@@ -12,10 +12,10 @@ var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
 app.use(jsonParser)
-var allowlist = ['https://hacker-board.herokuapp.com']
+var allowlist = ['https://hacker-board.herokuapp.com', 'http://localhost:4200', 'https://blazing-news.herokuapp.com']
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
-    console.log("HEADER::",req.header('Origin'))
+    // console.log("HEADER::",req.header('Origin'))
     if (allowlist.indexOf(req.header('Origin')) !== -1) {
         corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
     } else {
@@ -55,6 +55,41 @@ app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
         let resp = await axios.get(`http://hn.algolia.com/api/v1/search_by_date?query=${req.params.query}&tags=story&hitsPerPage=20`)
         res.send(resp.data);
     }
+})
+
+app.get('/reddit/:par/:order/:just', Cors(corsOptionsDelegate), async (req, res) => {
+    let para = req.params.par;
+    let order = req.params.order;
+    let just = req.params.just;
+    if (just == true) {
+        let resp = await axios.get(`https://www.reddit.com/search.rss?q=${para}`).catch(err=>{console.log(err)});
+        res.send(resp.data);
+    }
+    if (order == 'hot') {
+        let resp = await axios.get(`https://www.reddit.com/r/${para}/.rss`)
+        res.send(resp.data);
+    }
+    else {
+        let resp = await axios.get(`https://www.reddit.com/r/${para}/new/.rss?sort=new`)
+        res.send(resp.data);
+    }
+})
+
+app.get('/reddit/comments/:sub/comments/:uid/:txt', Cors(corsOptionsDelegate), async (req, res) => {
+    let sub = req.params.sub;
+    let uid = req.params.uid;
+    let txt = req.params.txt;
+    let resp = await axios.get(`https://www.reddit.com/r/${sub}/comments/${uid}/${txt}/.rss`);
+    res.send(resp.data);
+})
+
+app.get('/reddit/comments/:sub/comments/:uid/:txt/:cid', Cors(corsOptionsDelegate), async (req, res) => {
+    let sub = req.params.sub;
+    let uid = req.params.uid;
+    let txt = req.params.txt;
+    let cid = req.params.cid;
+    let resp = await axios.get(`https://www.reddit.com/r/${sub}/comments/${uid}/${txt}/${cid}/.rss`);
+    res.send(resp.data);
 })
 
 app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
