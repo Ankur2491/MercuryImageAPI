@@ -1,8 +1,23 @@
 // import Mercury from "@postlight/mercury-parser";
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+    // intercept OPTIONS method
+    if ('OPTIONS' == req.method) {
+      res.send(200);
+    }
+    else {
+      next();
+    }
+};
+
 const Cors = require('cors');
 const express = require("express");
 const axios = require('axios')
 const app = express();
+app.use(allowCrossDomain);
 const asyncRedis = require("async-redis");
 let redis_host = "redis-11422.c62.us-east-1-4.ec2.cloud.redislabs.com"
 let redis_port = 11422
@@ -12,17 +27,17 @@ var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
 app.use(jsonParser)
-var allowlist = ['https://hacker-board.herokuapp.com', 'http://localhost:4200', 'https://blazing-news.herokuapp.com']
-var corsOptionsDelegate = function (req, callback) {
-    var corsOptions;
-    // console.log("HEADER::",req.header('Origin'))
-    if (allowlist.indexOf(req.header('Origin')) !== -1) {
-        corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
-    } else {
-        corsOptions = { origin: false } // disable CORS for this request
-    }
-    callback(null, corsOptions) // callback expects two parameters: error and options
-}
+// var allowlist = ['https://hacker-board.herokuapp.com', 'http://localhost:4200', 'https://blazing-news.herokuapp.com']
+// var corsOptionsDelegate = function (req, callback) {
+//     var corsOptions;
+//     // console.log("HEADER::",req.header('Origin'))
+//     if (allowlist.indexOf(req.header('Origin')) !== -1) {
+//         corsOptions = { origin: true } // reflect (enable) the requested origin in the CORS response
+//     } else {
+//         corsOptions = { origin: false } // disable CORS for this request
+//     }
+//     callback(null, corsOptions) // callback expects two parameters: error and options
+// }
 const Mercury = require('@postlight/mercury-parser');
 
 var imagekit = new ImageKit({
@@ -32,7 +47,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", Cors(corsOptionsDelegate), async (req, res) => {
+app.post("/image", async (req, res) => {
     const url = req.body.url
     let resp = await Mercury.parse(url);
     res.send(resp);
@@ -45,7 +60,7 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
-app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/search/:query/:pref', async (req, res) => {
     let preference = req.params.pref;
     if (preference == "pop") {
         let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20`)
@@ -57,7 +72,7 @@ app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
     }
 })
 
-app.get('/reddit/:par/:order/:just', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/:par/:order/:just', async (req, res) => {
     let para = req.params.par;
     let order = req.params.order;
     let just = req.params.just;
@@ -75,7 +90,7 @@ app.get('/reddit/:par/:order/:just', Cors(corsOptionsDelegate), async (req, res)
     }
 })
 
-app.get('/reddit/comments/:sub/comments/:uid/:txt', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/comments/:sub/comments/:uid/:txt', async (req, res) => {
     let sub = req.params.sub;
     let uid = req.params.uid;
     let txt = req.params.txt;
@@ -83,7 +98,7 @@ app.get('/reddit/comments/:sub/comments/:uid/:txt', Cors(corsOptionsDelegate), a
     res.send(resp.data);
 })
 
-app.get('/reddit/comments/:sub/comments/:uid/:txt/:cid', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/comments/:sub/comments/:uid/:txt/:cid', async (req, res) => {
     let sub = req.params.sub;
     let uid = req.params.uid;
     let txt = req.params.txt;
@@ -105,7 +120,7 @@ app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
 })
 
 
-app.post('/smartRead', Cors(corsOptionsDelegate), async (req, res) => {
+app.post('/smartRead', async (req, res) => {
     console.log(req.body);
     const url = req.body.url
     let result = await Mercury.parse(url).catch(err => { console.log("mercuryError", err) });
