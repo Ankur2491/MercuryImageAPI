@@ -107,8 +107,8 @@ app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
     }
 })
 
-
-app.post('/smartRead', async (req, res) => {
+app.options('/smartRead', cors())
+app.post('/smartRead', cors(), async (req, res) => {
     console.log(req.body);
     const url = req.body.url
     let result = await Mercury.parse(url).catch(err => { console.log("mercuryError", err) });
