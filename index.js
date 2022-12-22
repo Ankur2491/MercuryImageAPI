@@ -12,9 +12,7 @@ var bodyParser = require('body-parser')
 var ImageKit = require("imagekit");
 var jsonParser = bodyParser.json()
 app.use(jsonParser)
-app.use(cors())
-// var allowlist = ['https://hacker-board.herokuapp.com', 'http://localhost:4200', 'https://blazing-news.vercel.app']
-/*
+var allowlist = ['https://blazing-news.vercel.app']
 var corsOptionsDelegate = function (req, callback) {
     var corsOptions;
     // console.log("HEADER::",req.header('Origin'))
@@ -25,7 +23,7 @@ var corsOptionsDelegate = function (req, callback) {
     }
     callback(null, corsOptions) // callback expects two parameters: error and options
 }
-*/
+
 const Mercury = require('@postlight/mercury-parser');
 
 var imagekit = new ImageKit({
@@ -107,8 +105,8 @@ app.get('/searchByPageIndex/:query/:index/:pref', async (req, res) => {
     }
 })
 
-app.options('/smartRead', cors())
-app.post('/smartRead', cors(), async (req, res) => {
+app.options('/smartRead', cors(corsOptionsDelegate))
+app.post('/smartRead', cors(corsOptionsDelegate), async (req, res) => {
     console.log(req.body);
     const url = req.body.url
     let result = await Mercury.parse(url).catch(err => { console.log("mercuryError", err) });
