@@ -33,7 +33,7 @@ var imagekit = new ImageKit({
 });
 
 let port = process.env.PORT || 3000;
-app.post("/image", Cors(corsOptionsDelegate), async (req, res) => {
+app.post("/image", cors(corsOptionsDelegate), async (req, res) => {
     const url = req.body.url
     let resp = await Mercury.parse(url);
     res.send(resp);
@@ -46,7 +46,7 @@ app.get('/getLatestImages/:index', async (req, res) => {
     await fun(req.params.index);
 })
 
-app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/search/:query/:pref', cors(corsOptionsDelegate), async (req, res) => {
     let preference = req.params.pref;
     if (preference == "pop") {
         let resp = await axios.get(`http://hn.algolia.com/api/v1/search?query=${req.params.query}&tags=story&hitsPerPage=20`)
@@ -58,7 +58,7 @@ app.get('/search/:query/:pref', Cors(corsOptionsDelegate), async (req, res) => {
     }
 })
 
-app.get('/reddit/:par/:order/:just', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/:par/:order/:just', cors(corsOptionsDelegate), async (req, res) => {
     let para = req.params.par;
     let order = req.params.order;
     let just = req.params.just;
@@ -76,7 +76,7 @@ app.get('/reddit/:par/:order/:just', Cors(corsOptionsDelegate), async (req, res)
     }
 })
 
-app.get('/reddit/comments/:sub/comments/:uid/:txt', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/comments/:sub/comments/:uid/:txt', cors(corsOptionsDelegate), async (req, res) => {
     let sub = req.params.sub;
     let uid = req.params.uid;
     let txt = req.params.txt;
@@ -84,7 +84,7 @@ app.get('/reddit/comments/:sub/comments/:uid/:txt', Cors(corsOptionsDelegate), a
     res.send(resp.data);
 })
 
-app.get('/reddit/comments/:sub/comments/:uid/:txt/:cid', Cors(corsOptionsDelegate), async (req, res) => {
+app.get('/reddit/comments/:sub/comments/:uid/:txt/:cid', cors(corsOptionsDelegate), async (req, res) => {
     let sub = req.params.sub;
     let uid = req.params.uid;
     let txt = req.params.txt;
